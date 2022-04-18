@@ -36,15 +36,15 @@ logger = logging.getLogger(__name__)
 
 
 class RaspberryPi:
-    # Pin definition
-    RST_PIN         = 17
-    DC_PIN          = 25
-    CS_PIN          = 8
-    BUSY_PIN        = 24
-
-    def __init__(self):
+    def __init__(self, rst, dc, cs, busy, spiNum):
         import spidev
         import RPi.GPIO
+
+        self.RST_PIN = rst
+        self.DC_PIN = dc
+        self.CS_PIN = cs
+        self.BUSY_PIN = busy
+        self.spiNum = spiNum
 
         self.GPIO = RPi.GPIO
         self.SPI = spidev.SpiDev()
@@ -72,8 +72,8 @@ class RaspberryPi:
         self.GPIO.setup(self.CS_PIN, self.GPIO.OUT)
         self.GPIO.setup(self.BUSY_PIN, self.GPIO.IN)
 
-        # SPI device, bus = 0, device = 0
-        self.SPI.open(0, 0)
+        # SPI device, bus = spiNum, device = 0
+        self.SPI.open(self.spiNum, 0)
         self.SPI.max_speed_hz = 4000000
         self.SPI.mode = 0b00
         return 0

@@ -37,45 +37,47 @@ EPD_HEIGHT      = 300
 logger = logging.getLogger(__name__)
 
 class EPD:
-    def __init__(self):
-        self.reset_pin = epdconfig.RST_PIN
-        self.dc_pin = epdconfig.DC_PIN
-        self.busy_pin = epdconfig.BUSY_PIN
-        self.cs_pin = epdconfig.CS_PIN
+    def __init__(self, rst, dc, cs, busy, spiNum):
+        self.rpi = epdconfig.RaspberryPi(rst, dc, cs, busy, spiNum)
+
+        self.reset_pin = self.rpi.RST_PIN
+        self.dc_pin = self.rpi.DC_PIN
+        self.busy_pin = self.rpi.BUSY_PIN
+        self.cs_pin = self.rpi.CS_PIN
         self.width = EPD_WIDTH
         self.height = EPD_HEIGHT
 
     # Hardware reset
     def reset(self):
-        epdconfig.digital_write(self.reset_pin, 1)
-        epdconfig.delay_ms(200) 
-        epdconfig.digital_write(self.reset_pin, 0)
-        epdconfig.delay_ms(5)
-        epdconfig.digital_write(self.reset_pin, 1)
-        epdconfig.delay_ms(200)   
+        self.rpi.digital_write(self.reset_pin, 1)
+        self.rpi.delay_ms(200) 
+        self.rpi.digital_write(self.reset_pin, 0)
+        self.rpi.delay_ms(5)
+        self.rpi.digital_write(self.reset_pin, 1)
+        self.rpi.delay_ms(200)   
 
     def send_command(self, command):
-        epdconfig.digital_write(self.dc_pin, 0)
-        epdconfig.digital_write(self.cs_pin, 0)
-        epdconfig.spi_writebyte([command])
-        epdconfig.digital_write(self.cs_pin, 1)
+        self.rpi.digital_write(self.dc_pin, 0)
+        self.rpi.digital_write(self.cs_pin, 0)
+        self.rpi.spi_writebyte([command])
+        self.rpi.digital_write(self.cs_pin, 1)
 
     def send_data(self, data):
-        epdconfig.digital_write(self.dc_pin, 1)
-        epdconfig.digital_write(self.cs_pin, 0)
-        epdconfig.spi_writebyte([data])
-        epdconfig.digital_write(self.cs_pin, 1)
+        self.rpi.digital_write(self.dc_pin, 1)
+        self.rpi.digital_write(self.cs_pin, 0)
+        self.rpi.spi_writebyte([data])
+        self.rpi.digital_write(self.cs_pin, 1)
         
     def ReadBusy(self):
         logger.debug("e-Paper busy")
         self.send_command(0x71);
-        while(epdconfig.digital_read(self.busy_pin) == 0): # 0: idle, 1: busy
+        while(self.rpi.digital_read(self.busy_pin) == 0): # 0: idle, 1: busy
             self.send_command(0x71);
-            epdconfig.delay_ms(20)
+            self.rpi.delay_ms(20)
         logger.debug("e-Paper busy release")
             
     def init(self):
-        if (epdconfig.module_init() != 0):
+        if (self.rpi.module_init() != 0):
             return -1
             
         self.reset()
@@ -122,7 +124,7 @@ class EPD:
             self.send_data(imagered[i])
         
         self.send_command(0x12) 
-        epdconfig.delay_ms(20)
+        self.rpi.delay_ms(20)
         self.ReadBusy()
         
     def Clear(self):
@@ -135,7 +137,7 @@ class EPD:
             self.send_data(0xFF)
         
         self.send_command(0x12) 
-        epdconfig.delay_ms(20)
+        self.rpi.delay_ms(20)
         self.ReadBusy()
 
     def sleep(self):
@@ -147,7 +149,7 @@ class EPD:
         self.send_command(0X07);  	#deep sleep
         self.send_data(0xA5);
         
-        epdconfig.delay_ms(2000)
-        epdconfig.module_exit()
+        self.rpi.delay_ms(2000)
+        self.rpi.module_exit()
 ### END OF FILE ###
 

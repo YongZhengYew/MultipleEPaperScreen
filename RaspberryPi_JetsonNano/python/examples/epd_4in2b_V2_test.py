@@ -18,10 +18,13 @@ logging.basicConfig(level=logging.DEBUG)
 try:
     logging.info("epd4in2b_V2 Demo")
     
-    epd = epd4in2b_V2.EPD()
+    epd0 = epd4in2b_V2.EPD(17,25,8,24,0)
+    epd1 = epd4in2b_V2.EPD(3,2,18,4,1)
     logging.info("init and Clear")
-    epd.init()
-    epd.Clear()
+    epd0.init()
+    epd0.Clear()
+    epd1.init()
+    epd1.Clear()
     time.sleep(1)
     
     # Drawing on the image
@@ -30,24 +33,6 @@ try:
     font18 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 18)
     
     # Drawing on the Horizontal image
-    logging.info("1.Drawing on the Horizontal image...") 
-    HBlackimage = Image.new('1', (epd.width, epd.height), 255)  # 298*126
-    HRYimage = Image.new('1', (epd.width, epd.height), 255)  # 298*126  ryimage: red or yellow image  
-    drawblack = ImageDraw.Draw(HBlackimage)
-    drawry = ImageDraw.Draw(HRYimage)
-    drawblack.text((10, 0), 'hello world', font = font24, fill = 0)
-    drawblack.text((10, 20), '4.2inch e-Paper bc', font = font24, fill = 0)
-    drawblack.text((150, 0), u'微雪电子', font = font24, fill = 0)    
-    drawblack.line((20, 50, 70, 100), fill = 0)
-    drawblack.line((70, 50, 20, 100), fill = 0)
-    drawblack.rectangle((20, 50, 70, 100), outline = 0)    
-    drawry.line((165, 50, 165, 100), fill = 0)
-    drawry.line((140, 75, 190, 75), fill = 0)
-    drawry.arc((140, 50, 190, 100), 0, 360, fill = 0)
-    drawry.rectangle((80, 50, 130, 100), fill = 0)
-    drawry.chord((200, 50, 250, 100), 0, 360, fill = 0)
-    epd.display(epd.getbuffer(HBlackimage), epd.getbuffer(HRYimage))
-    time.sleep(2)
     
     # Drawing on the Vertical image
     logging.info("2.Drawing on the Vertical image...")
@@ -67,30 +52,19 @@ try:
     drawry.arc((70, 90, 120, 140), 0, 360, fill = 0)
     drawry.rectangle((10, 150, 60, 200), fill = 0)
     drawry.chord((70, 150, 120, 200), 0, 360, fill = 0)
-    epd.display(epd.getbuffer(LBlackimage), epd.getbuffer(LRYimage))
+    epd0.display(epd0.getbuffer(LBlackimage), epd0.getbuffer(LRYimage))
+    epd1.display(epd1.getbuffer(LBlackimage), epd1.getbuffer(LRYimage))
     time.sleep(2)
-    
-    logging.info("3.read bmp file")
-    HBlackimage = Image.open(os.path.join(picdir, '4in2b-b.bmp'))
-    HRYimage = Image.open(os.path.join(picdir, '4in2b-r.bmp'))
-    # HBlackimage = Image.open(os.path.join(picdir, '4in2c-b.bmp'))
-    # HRYimage = Image.open(os.path.join(picdir, '4in2c-y.bmp'))
-    epd.display(epd.getbuffer(HBlackimage), epd.getbuffer(HRYimage))
-    time.sleep(2)
-    
-    logging.info("4.read bmp file on window")
-    blackimage1 = Image.new('1', (epd.width, epd.height), 255)  # 298*126
-    redimage1 = Image.new('1', (epd.width, epd.height), 255)  # 298*126    
-    newimage = Image.open(os.path.join(picdir, '100x100.bmp'))
-    blackimage1.paste(newimage, (50,10))    
-    epd.display(epd.getbuffer(blackimage1), epd.getbuffer(redimage1))
     
     logging.info("Clear...")
-    epd.init()
-    epd.Clear()
+    epd0.init()
+    epd0.Clear()
+    epd1.init()
+    epd1.Clear()
     
     logging.info("Goto Sleep...")
-    epd.sleep()
+    epd0.sleep()
+    epd1.sleep()
         
 except IOError as e:
     logging.info(e)
